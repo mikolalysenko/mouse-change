@@ -13,6 +13,8 @@ require('mouse-change')(function(buttons, x, y) {
 })
 ```
 
+[Try it out in your browser](https://mikolalysenko.github.io/mouse-change)
+
 # Install
 
 ```
