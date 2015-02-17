@@ -11,7 +11,36 @@ function mouseListen(element, callback) {
     element = window
   }
 
-  var buttonState = 0, x = 0, y = 0
+  var buttonState = 0
+  var x = 0
+  var y = 0
+  var mods = {
+    shift:   false,
+    alt:     false,
+    control: false,
+    meta:    false
+  }
+
+  function updateMods(ev) {
+    var changed = false
+    if('altKey' in ev) {
+      changed = changed || ev.altKey !== mods.alt
+      mods.alt = !!ev.altKey
+    }
+    if('shiftKey' in ev) {
+      changed = changed || ev.shiftKey !== mods.shift
+      mods.shift = !!ev.shiftKey
+    }
+    if('ctrlKey' in ev) {
+      changed = changed || ev.ctrlKey !== mods.control
+      mods.control = !!ev.ctrlKey
+    }
+    if('metaKey' in ev) {
+      changed = changed || ev.metaKey !== mods.meta
+      mods.meta = !!ev.meta
+    }
+    return changed
+  }
 
   function handleEvent(nextButtons, ev) {
     var nextX = mouse.x(ev)
@@ -21,11 +50,12 @@ function mouseListen(element, callback) {
     }
     if(nextButtons !== buttonState ||
        nextX !== x ||
-       nextY !== y) {
+       nextY !== y || 
+       updateMods(ev)) {
       buttonState = nextButtons|0
       x = nextX||0
       y = nextY||0
-      callback(buttonState, x, y)
+      callback(buttonState, x, y, mods)
     }
   }
 
@@ -34,10 +64,24 @@ function mouseListen(element, callback) {
   }
 
   function handleBlur() {
-    if(buttonState || x || y) {
+    if(buttonState || 
+      x || 
+      y ||
+      mods.shift ||
+      mods.alt ||
+      mods.meta ||
+      mods.control) {
+
       x = y = 0
       buttonState = 0
-      callback(0, 0, 0)
+      mods.shift = mods.alt = mods.control = mods.meta = false
+      callback(0, 0, 0, mods)
+    }
+  }
+
+  function handleMods(ev) {
+    if(updateMods(ev)) {
+      callback(buttonState, x, y, mods)
     }
   }
 
@@ -48,9 +92,11 @@ function mouseListen(element, callback) {
       handleEvent(buttonState, ev)
     }
   })
+
   element.addEventListener('mousedown', function(ev) {
     handleEvent(buttonState | mouse.buttons(ev), ev)
   })
+
   element.addEventListener('mouseup', function(ev) {
     handleEvent(buttonState & ~mouse.buttons(ev), ev)
   })
@@ -59,8 +105,11 @@ function mouseListen(element, callback) {
   element.addEventListener('mouseenter', clearState)
   element.addEventListener('mouseout', clearState)
   element.addEventListener('mouseover', clearState)
-  element.addEventListener('blur', handleBlur)
+  element.addEventListener('keyup', handleMods)
+  element.addEventListener('keydown', handleMods)
+  element.addEventListener('keypress', handleMods)
 
+  element.addEventListener('blur', handleBlur)
   if(element !== window) {
     window.addEventListener('blur', handleBlur)
   }
