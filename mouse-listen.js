@@ -37,7 +37,7 @@ function mouseListen(element, callback) {
     }
     if('metaKey' in ev) {
       changed = changed || ev.metaKey !== mods.meta
-      mods.meta = !!ev.meta
+      mods.meta = !!ev.metaKey
     }
     return changed
   }
@@ -105,12 +105,15 @@ function mouseListen(element, callback) {
   element.addEventListener('mouseenter', clearState)
   element.addEventListener('mouseout', clearState)
   element.addEventListener('mouseover', clearState)
+  element.addEventListener('blur', handleBlur)
   element.addEventListener('keyup', handleMods)
   element.addEventListener('keydown', handleMods)
   element.addEventListener('keypress', handleMods)
 
-  element.addEventListener('blur', handleBlur)
   if(element !== window) {
     window.addEventListener('blur', handleBlur)
+    window.addEventListener('keyup', handleMods)
+    window.addEventListener('keydown', handleMods)
+    window.addEventListener('keypress', handleMods)
   }
 }
