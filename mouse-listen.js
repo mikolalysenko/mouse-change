@@ -5,10 +5,10 @@ module.exports = mouseListen
 var mouse = require('mouse-event')
 
 function mouseListen(element, callback) {
-  
+
   if(!callback) {
     callback = element
-    element = window
+    element = document.body
   }
 
   var buttonState = 0
@@ -20,6 +20,7 @@ function mouseListen(element, callback) {
     control: false,
     meta:    false
   }
+  var attached = false
 
   function updateMods(ev) {
     var changed = false
@@ -50,7 +51,7 @@ function mouseListen(element, callback) {
     }
     if(nextButtons !== buttonState ||
        nextX !== x ||
-       nextY !== y || 
+       nextY !== y ||
        updateMods(ev)) {
       buttonState = nextButtons|0
       x = nextX||0
@@ -64,8 +65,8 @@ function mouseListen(element, callback) {
   }
 
   function handleBlur() {
-    if(buttonState || 
-      x || 
+    if(buttonState ||
+      x ||
       y ||
       mods.shift ||
       mods.alt ||
@@ -85,35 +86,122 @@ function mouseListen(element, callback) {
     }
   }
 
-  element.addEventListener('mousemove', function(ev) {
+  function handleMouseMove(ev) {
     if(mouse.buttons(ev) === 0) {
       handleEvent(0, ev)
     } else {
       handleEvent(buttonState, ev)
     }
-  })
-
-  element.addEventListener('mousedown', function(ev) {
-    handleEvent(buttonState | mouse.buttons(ev), ev)
-  })
-
-  element.addEventListener('mouseup', function(ev) {
-    handleEvent(buttonState & ~mouse.buttons(ev), ev)
-  })
-
-  element.addEventListener('mouseleave', clearState)
-  element.addEventListener('mouseenter', clearState)
-  element.addEventListener('mouseout', clearState)
-  element.addEventListener('mouseover', clearState)
-  element.addEventListener('blur', handleBlur)
-  element.addEventListener('keyup', handleMods)
-  element.addEventListener('keydown', handleMods)
-  element.addEventListener('keypress', handleMods)
-
-  if(element !== window) {
-    window.addEventListener('blur', handleBlur)
-    window.addEventListener('keyup', handleMods)
-    window.addEventListener('keydown', handleMods)
-    window.addEventListener('keypress', handleMods)
   }
+
+  function handleMouseDown(ev) {
+    handleEvent(buttonState | mouse.buttons(ev), ev)
+  }
+
+  function handleMouseUp(ev) {
+    handleEvent(buttonState & ~mouse.buttons(ev), ev)
+  }
+
+  function attachListeners() {
+    if(attached) {
+      return
+    }
+    attached = true
+
+    element.addEventListener('mousemove', handleMouseMove)
+
+    element.addEventListener('mousedown', handleMouseDown)
+
+    element.addEventListener('mouseup', handleMouseUp)
+
+    element.addEventListener('mouseleave', clearState)
+    element.addEventListener('mouseenter', clearState)
+    element.addEventListener('mouseout', clearState)
+    element.addEventListener('mouseover', clearState)
+
+    element.addEventListener('blur', handleBlur)
+
+    element.addEventListener('keyup', handleMods)
+    element.addEventListener('keydown', handleMods)
+    element.addEventListener('keypress', handleMods)
+
+    if(element !== window) {
+      window.addEventListener('blur', handleBlur)
+
+      window.addEventListener('keyup', handleMods)
+      window.addEventListener('keydown', handleMods)
+      window.addEventListener('keypress', handleMods)
+    }
+  }
+
+  function detachListeners() {
+    if(!attached) {
+      return
+    }
+    attached = false
+
+    element.removeEventListener('mousemove', handleMouseMove)
+
+    element.removeEventListener('mousedown', handleMouseDown)
+
+    element.removeEventListener('mouseup', handleMouseUp)
+
+    element.removeEventListener('mouseleave', clearState)
+    element.removeEventListener('mouseenter', clearState)
+    element.removeEventListener('mouseout', clearState)
+    element.removeEventListener('mouseover', clearState)
+
+    element.removeEventListener('blur', handleBlur)
+
+    element.removeEventListener('keyup', handleMods)
+    element.removeEventListener('keydown', handleMods)
+    element.removeEventListener('keypress', handleMods)
+
+    if(element !== window) {
+      window.removeEventListener('blur', handleBlur)
+
+      window.removeEventListener('keyup', handleMods)
+      window.removeEventListener('keydown', handleMods)
+      window.removeEventListener('keypress', handleMods)
+    }
+  }
+
+  //Attach listeners
+  attachListeners()
+
+  var result = {
+    element: element
+  }
+
+  Object.defineProperties(result, {
+    enabled: {
+      get: function() { return attached },
+      set: function(f) {
+        if(f) {
+          attachListeners()
+        } else {
+          detachListeners
+        }
+      },
+      enumerable: true
+    },
+    buttons: {
+      get: function() { return buttonState },
+      enumerable: true
+    },
+    x: {
+      get: function() { return x },
+      enumerable: true
+    },
+    y: {
+      get: function() { return y },
+      enumerable: true
+    },
+    mods: {
+      get: function() { return mods },
+      enumerable: true
+    }
+  })
+
+  return result
 }

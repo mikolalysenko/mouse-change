@@ -6,9 +6,9 @@ Listens for any mouse state changes.
 
 ```javascript
 require('mouse-change')(function(buttons, x, y) {
-  document.body.innerHTML = 
-    '<p>Buttons: 0b' + buttons.toString(2) + 
-    ', x:' + x + 
+  document.body.innerHTML =
+    '<p>Buttons: 0b' + buttons.toString(2) +
+    ', x:' + x +
     ', y:' + y + '</p>'
 })
 ```
@@ -23,7 +23,7 @@ npm i mouse-change
 
 # API
 
-#### `require('mouse-change')([element,] onchange(buttons,x,y,mods))`
+#### `var l = require('mouse-change')([element,] onchange(buttons,x,y,mods))`
 Listens for any mouse state changes on the given element.
 
 * `element` is an optional element
@@ -36,6 +36,23 @@ Listens for any mouse state changes on the given element.
         * `mods.alt` is the state of then alt key
         * `mods.control` is the state of the control key
         * `mods.meta` is the state of the meta key
+
+**Returns** A new listener object which can be used to configure the listener.
+
+#### `l.enabled`
+Toggles whether or not 
+
+#### `l.x`
+The x coordinate of the mouse
+
+#### `l.y`
+The y coordinate of the mouse
+
+#### `l.buttons`
+The button state of the mouse
+
+#### `l.mods`
+The current state of the keyboard modifiers
 
 # License
 (c) 2015 Mikola Lysenko. MIT License
