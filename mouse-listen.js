@@ -8,7 +8,7 @@ function mouseListen(element, callback) {
 
   if(!callback) {
     callback = element
-    element = document.body
+    element = window
   }
 
   var buttonState = 0
