@@ -5,7 +5,6 @@ module.exports = mouseListen
 var mouse = require('mouse-event')
 
 function mouseListen(element, callback) {
-
   if(!callback) {
     callback = element
     element = window
@@ -56,7 +55,7 @@ function mouseListen(element, callback) {
       buttonState = nextButtons|0
       x = nextX||0
       y = nextY||0
-      callback(buttonState, x, y, mods)
+      callback && callback(buttonState, x, y, mods)
     }
   }
 
@@ -76,13 +75,13 @@ function mouseListen(element, callback) {
       x = y = 0
       buttonState = 0
       mods.shift = mods.alt = mods.control = mods.meta = false
-      callback(0, 0, 0, mods)
+      callback && callback(0, 0, 0, mods)
     }
   }
 
   function handleMods(ev) {
     if(updateMods(ev)) {
-      callback(buttonState, x, y, mods)
+      callback && callback(buttonState, x, y, mods)
     }
   }
 

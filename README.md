@@ -23,11 +23,11 @@ npm i mouse-change
 
 # API
 
-#### `var l = require('mouse-change')([element,] onchange(buttons,x,y,mods))`
+#### `var l = require('mouse-change')([element, onchange(buttons,x,y,mods)])`
 Listens for any mouse state changes on the given element.
 
 * `element` is an optional element
-* `onchange(buttons,x,y,mods)` is called every time that the mouse state changes inside `element`
+* `onchange(buttons,x,y,mods)` is an optional callback which gets called every time that the mouse state changes inside `element`
     + `buttons` is the state of the mouse buttons
     + `x` is the x coordinate of the mouse
     + `y` is the y coordinate of the mouse
@@ -40,7 +40,7 @@ Listens for any mouse state changes on the given element.
 **Returns** A new listener object which can be used to configure the listener.
 
 #### `l.enabled`
-Toggles whether or not 
+Toggles whether or not
 
 #### `l.x`
 The x coordinate of the mouse
