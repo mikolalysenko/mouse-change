@@ -1,6 +1,6 @@
 {
   "name": "mouse-change",
-  "version": "1.2.1",
+  "version": "1.3.0",
   "description": "Mouse state change listener",
   "main": "mouse-listen.js",
   "directories": {
